@@ -49,7 +49,9 @@
 /* USER CODE BEGIN PV */
 uint16_t ADC_BUFFER[ADC_BUFFER_LEN];
 _Bool DEBUG1;
-float voltage_oversample, voltage;
+const float CURRENT_SENSOR_GAIN = 0.5f;
+float current_oversample, current;
+float current_DEBUG;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,8 +71,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
   for(uint8_t i = 0; i < ADC_BUFFER_LEN; i++)
     adc_buffer_sum += ADC_BUFFER[i];
 
-  voltage_oversample = (3.3f/4095.0f/10.0f) * adc_buffer_sum;
-  voltage = (3.3f/4095.0f) * ADC_BUFFER[5];
+  current_oversample = (3.3f/4095.0f/10.0f) * adc_buffer_sum * CURRENT_SENSOR_GAIN;
+  current = (3.3f/4095.0f) * ADC_BUFFER[5] * CURRENT_SENSOR_GAIN;
 
   // TODO: Current controller logic
   // pwm_duty = PID_GetOutput(&hpid, i_ref, i_meas); // +/- 100%
@@ -123,6 +125,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    current_DEBUG = current_oversample;
+    HAL_Delay(0);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
